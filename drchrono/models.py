@@ -3,6 +3,8 @@ from __future__ import division
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from dateutil import tz
+from datetime import timedelta
 from localflavor.us.us_states import US_STATES
 
 from api import patch_appointment
@@ -111,20 +113,30 @@ class AppointmentManager(models.Manager):
         appts = self.get_queryset().get_appointments(date, checked_in, seen, completed)
         retAppts = []
         for appt in appts:
+            checked_in_time = None
+            seen_at_time = None
+            completed_at_time = None
+            if appt.checked_in_time is not None:
+                checked_in_time = appt.checked_in_time.isoformat()
+            if appt.seen_at_time is not None:
+                seen_at_time = appt.seen_at_time.isoformat()
+            if appt.completed_at_time is not None:
+                completed_at_time = appt.completed_at_time.isoformat()
             retAppts.append({
                 'id': appt.id,
                 'first_name': appt.patient.first_name,
                 'last_name': appt.patient.last_name,
                 'picture': appt.patient.image_link,
-                'scheduled_time': appt.scheduled_time,
+                'scheduled_time': appt.scheduled_time.astimezone(
+                    tz.gettz(timezone.get_default_timezone_name())).isoformat(),
                 'reason': appt.reason,
                 'status': appt.status,
                 'checked_in': appt.checked_in,
                 'seen': appt.seen,
                 'completed': appt.completed,
-                'checked_in_time': appt.checked_in_time,
-                'seen_at_time': appt.seen_at_time,
-                'completed_at_time': appt.completed_at_time,
+                'checked_in_time': checked_in_time,
+                'seen_at_time': seen_at_time,
+                'completed_at_time': completed_at_time,
             })
         return retAppts
 
@@ -208,8 +220,20 @@ class Appointment(models.Model):
 
     @classmethod
     def avg_waiting_time(cls):
-        apts = cls.objects.completed()
-        return sum([apt.seen_at_time - apt.checked_in_time] for apt in apts) / apts.count()
+        appts = cls.objects.all()
+        total_waiting_time = timedelta(0)
+        count = 0
+        for appt in appts:
+            if appt.seen_at_time is not None:
+                total_waiting_time += appt.seen_at_time - appt.checked_in_time
+                count += 1
+            elif appt.checked_in_time is not None:
+                total_waiting_time += timezone.now() - appt.checked_in_time
+                count += 1
+        total_waiting_time = total_waiting_time.microseconds + \
+                 1000000 * (total_waiting_time.seconds + 86400 * total_waiting_time.days)
+
+        return total_waiting_time // (count*1000)
 
     def __str__(self):
         return '{}, {}, {}'.format(self.doctor, self.patient, self.scheduled_time)

@@ -1,8 +1,11 @@
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+
 import hashlib
 import pytz
 from dateutil import parser
+
+
 from api import Endpoint, URL_ROOT
 from models import *
 from forms import VerifyForm
@@ -188,3 +191,4 @@ def doctor_required(func):
                 return redirect(reverse('checkin'))
         return func(request, *args, **kwargs)
     return wrapper
+

@@ -10,6 +10,9 @@ from forms import *
 def login(request):
     return render(request, 'login.html')
 
+def logout(request):
+    return redirect(reverse('login'))
+
 @login_required
 def home(request):
     doc = Doctor.objects.filter(doctor_user=request.user)
@@ -19,7 +22,9 @@ def home(request):
     #appointments = get_all_daily_appointments(request)
     update_local(request)
     appts = Appointment.objects.get_appointments()
-    return render(request, 'home.html', {'appointments': appts})
+    avg_waiting_time = Appointment.avg_waiting_time()
+    return render(request, 'home.html', {'appointments': appts,
+                                         'avg_waiting_time': avg_waiting_time})
 
 @login_required
 def doctor(request):
@@ -67,7 +72,9 @@ def doctor(request):
 def checkin(request):
     if request.method == 'GET':
         form = CheckInForm()
-        return render(request, 'checkin.html', {'checkinForm': form})
+        avg_waiting_time = Appointment.avg_waiting_time()
+        return render(request, 'checkin.html', {'checkinForm': form,
+                                                'avg_waiting_time': avg_waiting_time})
     elif request.method == 'POST':
         form = CheckInForm(request.POST)
         if form.is_valid():

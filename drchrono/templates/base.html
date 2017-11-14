@@ -6,6 +6,7 @@
   </head>
   <body>
 
+  <main>
     {% block messages %}
     {% if messages %}
     <div class="container">
@@ -24,6 +25,10 @@
     <div class="container">
       {% block content %}{% endblock %}
     </div>
+    </main>
+
+
+  {% block footer %}{% endblock %}
 
   </body>
 

@@ -15,23 +15,34 @@
             <img src=" {{appt.picture}} " alt="" class="circle">
             <span class="title">{{ appt.first_name }} {{ appt.last_name }} </span>
             <p>
-                {{ appt.scheduled_time }} <br>
+                <span class="scheduled_time">{{ appt.scheduled_time }}</span><br>
                 {{ appt.reason }} <br>
+                <span class="hide checked_in_time" id="checked_in_{{appt.id}}">{{ appt.checked_in_time }}</span>
+                <span class="hide seen_at_time" id="seen_at_{{appt.id}}">{{ appt.seen_at_time }}</span><br>
+                <br>
+
             </p>
-            <div class="secondary-content">
-            <code class="row">{{ appt.status }}</code>
+            <div class="secondary-content right-align">
+            <code class="row ">{{ appt.status }}<br></code>
                 {% if appt.checked_in %}
                     {% if appt.seen %}
                         {% if not appt.completed %}
+                            <code id="seen_at_timediff_{{appt.id}}" class="row"></code>
                             <a class="row waves-effect waves-light btn purple darken-1" href='/complete/{{ appt.id }}'>Complete</a>
                         {% endif %}
                     {% else %}
+                        <code id="checked_in_timediff_{{appt.id}}" class="row"></code>
                         <a class="row waves-effect waves-light btn pink darken-1" href='/see/{{ appt.id }}/'>See</a>
+
                     {% endif %}
+
                 {% endif %}
             </div>
 
         </li>
     {% endfor %}
     </ul>
+
+{% include 'footer.html' with avg_waiting_time=avg_waiting_time%}
+
 {% endblock %}

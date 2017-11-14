@@ -110,7 +110,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+
 SOCIAL_AUTH_DRCHRONO_KEY = 'tXZf6Cf6CsXIg6HWPpza2niHrz385l5gdAQvU5tK'
 SOCIAL_AUTH_DRCHRONO_SECRET = '9nZnKI5x5fsSWfZa6e64vClsBNamV2iaJ7Ay7CPRHbvuDRrNno1tSVVsBFcGe95JTZ81C4bwWVXI23278sTwXutPheA2LUdcpWoO9aE3lySX0P3BZ1c7nmlgnT8j7DGg'
 LOGIN_URL = 'login'
+LOGOUT_URL ='logout'
 LOGIN_REDIRECT_URL = 'home'

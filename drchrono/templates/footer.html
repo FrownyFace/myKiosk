@@ -1,0 +1,22 @@
+
+{% block footer %}
+
+<footer class="page-footer">
+          <div class="container">
+            <div class="row">
+              <div class="col l6 s12">
+                <h5 class="white-text">Average Waiting Time: {{avg_waiting_time}} milliseconds</h5>
+                <p class="grey-text text-lighten-4">Or
+                    <span id="avg_waiting_time">{{avg_waiting_time}}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright">
+            <div class="container">
+            © 2014 Something that is not copyrighted
+            </div>
+          </div>
+    </footer>
+
+{% endblock %}

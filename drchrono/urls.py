@@ -8,6 +8,7 @@ import views
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^login/$', views.login, name='login'),
+    url(r'^logout/$', views.logout, name='logout'),
     url(r'^checkin/$', views.checkin, name='checkin'),
     url(r'^verify/(\d+)/$', views.verify, name='verify'),
     url(r'^info/(\d+)/$', views.info, name='info'),
