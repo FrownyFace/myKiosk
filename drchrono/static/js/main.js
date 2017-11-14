@@ -61,6 +61,12 @@ function avg_time(){
 $(document).ready(function() {
     $('select').material_select();
     //$('.modal-trigger').leanModal();
+    $('.grid').masonry({
+      itemSelector: '.grid-item',
+      columnWidth: 160,
+      gutter: 2
+    });
+
 
     displayTime();
     update_waiting_time('checked_in');

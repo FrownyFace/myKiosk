@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^checkin/$', views.checkin, name='checkin'),
     url(r'^verify/(\d+)/$', views.verify, name='verify'),
     url(r'^info/(\d+)/$', views.info, name='info'),
+    url(r'^analysis/$', views.analysis, name='analysis'),
     url(r'^schedule/$', views.schedule, name='schedule'),
     url(r'^doctor/$', views.doctor, name='doctor'),
     url(r'^see/(\d+)/$', views.see, name='see'),

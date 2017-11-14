@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block head_title %}Analysis{{ block.super }}{% endblock %}
+
+{% block content %}
+{% include 'nav.html' %}
+
+<div class="grid">
+  <div class="grid-item grid-item--width3 grid-item--height2">
+      {{ the_div.0|safe }}
+  </div>
+  <div class="grid-item grid-item--width3 grid-item--height3">
+      {{ the_div.1|safe }}
+  </div>
+</div>
+
+{% for script in the_script %}
+    {{ script|safe }}
+{% endfor %}
+
+
+{% include 'footer.html' with avg_waiting_time=avg_waiting_time%}
+{% endblock %}

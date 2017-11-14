@@ -186,9 +186,8 @@ def timeformater(dt):
 ### Decorators
 def doctor_required(func):
     def wrapper(request, *args, **kwargs):
-        if 'doctor_secure' in request.session.keys():
-            if request.sesion.get('doctor_secure', False):
-                return redirect(reverse('checkin'))
+        if 'doctor_secure' not in request.session.keys():
+            return redirect(reverse('checkin'))
         return func(request, *args, **kwargs)
     return wrapper
 

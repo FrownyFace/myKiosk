@@ -3,6 +3,9 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 import hashlib
+from bokeh.plotting import figure
+from bokeh.resources import CDN
+from bokeh.embed import components
 
 from utils import *
 from forms import *
@@ -181,3 +184,26 @@ def complete(request, appt_id):
 def schedule(request):
 
     return render(request, 'schedule.html')
+
+@login_required
+def analysis(request):
+    p1 = figure(plot_width=475, plot_height=355)
+    p1.circle([1, 2], [3, 4])
+
+    p2 = figure(plot_width=475, plot_height=475)
+    p2.circle([50,100], [60,10])
+
+    plist = [p1, p2]
+    script = []
+    div = []
+    for p in plist:
+        p.toolbar.logo = None
+        p.toolbar_location = None
+        s, d = components(p, CDN)
+        script.append(s)
+        div.append(d)
+
+    avg_waiting_time = Appointment.avg_waiting_time()
+    return render(request, 'analysis.html',
+                  {"the_script": script, "the_div": div,
+                  "avg_waiting_time": avg_waiting_time})
