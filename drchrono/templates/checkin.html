@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Lookup{% endblock %}
+
+{% block content %}
+
+
+<div class="container" >
+    <h1>Check-in to your appointment</h1>
+      <form  method="POST" class="col s12">{% csrf_token %}
+          <div class="col-md-offset-2">
+              <div class="row">
+                  <div class="input-field col s6">
+                      <input id="first_name" type="text" class="validate" name="first_name">
+                      <label for="first_name" data-error="wrong">First Name</label>
+                  </div>
+                  <div class="input-field col s6">
+                      <input id="last_name" type="text" class="validate" name="last_name">
+                      <label for="last_name" data-error="wrong">Last Name</label>
+                  </div>
+              </div>
+              <button class="btn waves-effect waves-light" type="submit" value="Search">Search</button>
+          </div>
+
+      </form>
+</div>
+{% endblock %}

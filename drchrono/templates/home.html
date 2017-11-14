@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block head_title %}Dashboard {{ block.super }}{% endblock %}
+
+{% block content %}
+
+{% include 'nav.html' %}
+
+    <ul class="collection">
+    {% for appt in appointments %}
+        <li class="collection-item avatar
+        {{ appt.checked_in|yesno:"yellow lighten-5,"}}
+        {{ appt.seen|yesno:"amber lighten-3,"}}
+        {{ appt.completed|yesno:"orange lighten-1,"}}"
+        >
+            <img src=" {{appt.picture}} " alt="" class="circle">
+            <span class="title">{{ appt.first_name }} {{ appt.last_name }} </span>
+            <p>
+                {{ appt.scheduled_time }} <br>
+                {{ appt.reason }} <br>
+            </p>
+            <div class="secondary-content">
+            <code class="row">{{ appt.status }}</code>
+                {% if appt.checked_in %}
+                    {% if appt.seen %}
+                        {% if not appt.completed %}
+                            <a class="row waves-effect waves-light btn purple darken-1" href='/complete/{{ appt.id }}'>Complete</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="row waves-effect waves-light btn pink darken-1" href='/see/{{ appt.id }}/'>See</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

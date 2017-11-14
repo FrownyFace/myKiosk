@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Update Information{% endblock %}
+
+{% block content %}
+
+
+<div class="container" >
+    <h1>Update your info</h1>
+    <div class="form-group">
+      <form method="POST" class="form-display">{% csrf_token %}
+        {{ infoForm.as_p }}
+        <button class="btn waves-effect waves-light" type="submit" value="Search">Complete CheckIn</button>
+      </form>
+    </div>
+</div>
+
+{% endblock %}

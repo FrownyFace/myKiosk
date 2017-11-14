@@ -1,0 +1,70 @@
+html{
+    font-family: 'Roboto', sans-serif;
+}
+
+body{
+    padding: 10px;
+}
+
+.messages_cont {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 65px;
+    list-style: none;
+}
+
+.fade.in {
+    opacity: 1;
+}
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+.alert-info {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+.alert-warning {
+    color: #856404;
+    background-color: #FFF3CD;
+    border-color: #d6e9c6;
+}
+.alert-danger {
+    color: #721C24;
+    background-color: #F8D7DA;
+    border-color: #FFEEBA;
+}
+.alert {
+    padding: 12px;
+    width: 300px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    vertical-align: middle;
+    z-index: 99;
+}
+.fade {
+    opacity: 0;
+    -webkit-transition: opacity .15s linear;
+    -o-transition: opacity .15s linear;
+    transition: opacity .15s linear;
+}
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    filter: alpha(opacity=20);
+    opacity: .2;
+}
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+a {
+    background-color: transparent;
+}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block head_title %}New Doctor{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="container" >
+    <h1>Please Verify Doctor Info</h1>
+    <div class="form-group">
+      <form method="POST" class="form-display">{% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn waves-effect waves-light" type="submit" value="Search">Verify</button>
+      </form>
+    </div>
+</div>
+
+{% endblock %}

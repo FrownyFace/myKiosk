@@ -1,0 +1,22 @@
+
+
+<ul id="dropdown1" class="dropdown-content">
+  <li><a href="{% url 'doctor' %}">Settings</a></li>
+  <li><a href="#!">Disable Kiosk</a></li>
+  <li class="divider"></li>
+  <li><a href="{% url 'social:disconnect' 'drchrono' %}">Logout</a></li>
+</ul>
+
+
+<nav>
+    <div class="nav-wrapper">
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <li class=""><a href="#">Dashboard</a></li>
+        <li class=""><a href="{% url 'checkin' %}">Check In</a></li>
+
+        <li class=""><a href="{% url 'schedule' %}">Schedule</a></li>
+        <li id="clock"></li>
+      </ul>
+      <b><a class="right dropdown-button" href="#!" data-activates="dropdown1">{{request.user}}<i class="material-icons right">arrow_drop_down</i></a></b>
+    </div>
+  </nav>
