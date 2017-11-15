@@ -4,10 +4,14 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 import hashlib
+import numpy as np
 import json, copy
+from dateutil.relativedelta import relativedelta
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import components
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.palettes import Spectral6
 from django.views.decorators.csrf import csrf_exempt
 
 from tasks import process_webhook, task_debug
@@ -234,11 +238,45 @@ def schedule(request):
 @doctor_required
 @login_required
 def analysis(request):
-    p1 = figure(plot_width=475, plot_height=355)
-    p1.circle([1, 2], [3, 4])
+    index1 = [
+        'blank',
+        'indian',
+        'asian',
+        'black',
+        'hawaiian',
+        'white',
+        'declined',
+    ]
 
-    p2 = figure(plot_width=475, plot_height=475)
-    p2.circle([50,100], [60,10])
+    ### RACE
+    hover1 = HoverTool(tooltips=[
+        ("Race", "@race"),
+        ("Count", "@counts"),
+    ])
+
+    series1 = [Patient.objects.filter(race=x).count() for x in index1]
+    source = ColumnDataSource(data=dict(race=index1, counts=series1, color=Spectral6))
+    p1 = figure(x_range=index1, plot_height=475, plot_width=475, title="Race Counts",
+               toolbar_location=None, tools=[hover1])
+    p1.vbar(x='race', top='counts', width=0.9, color='color', source=source)
+
+    series2 = []
+    for x in Patient.objects.values('dob'):
+        if x['dob'] is not None:
+            series2.append(relativedelta(timezone.now().date(), x['dob'].date()).years)
+
+
+    ### AGE
+    hover2 = HoverTool(tooltips=[
+        ("Count", "@top"),
+        ("Age Bin", "(@left, @right)")
+    ])
+
+    hist, edges = np.histogram(series2, density=False, bins=10)
+    p2 = figure(plot_width=475, plot_height=475, background_fill_color="#E8DDCB",
+                title="Age Histogram", tools=[hover2])
+    p2.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+            fill_color="#036564", line_color="#033649")
 
     plist = [p1, p2]
     script = []
