@@ -10,7 +10,8 @@ from bokeh.resources import CDN
 from bokeh.embed import components
 from django.views.decorators.csrf import csrf_exempt
 
-from tasks import process_webhook
+from tasks import process_webhook, task_debug
+from celery import debug_task
 
 from utils import *
 from forms import *
@@ -260,9 +261,11 @@ def webhook(request):
         return HttpResponse(json.dumps({'secret_token':'haha'}), content_type="application/json", status=200, )
     if request.method == 'POST':
         event = request.META['HTTP_X_DRCHRONO_EVENT']
-        body = request.body['object']
-        process_webhook(request, event, body)
-
+        body = json.loads(request.body)['object']
+        try:
+            process_webhook.apply_async(args=[event, body])
+        except:
+            pass
         return HttpResponse(status=200)
     return HttpResponse(json.dumps({'secret_token': 'haha'}), content_type="application/json", status=200, )
 

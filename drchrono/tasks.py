@@ -1,29 +1,38 @@
 from __future__ import absolute_import, unicode_literals
-from celery import task
+from celery import shared_task
 
-from .models import Appointment, Patient, WebhookTransaction
 from .utils import create_appointments_local, create_patients_local
+from .models import Doctor
 
 
-@task()
+@shared_task
 def task_debug():
     print('DEBUG')
     return 'DEBUG'
 
-@task()
-def process_webhook(request, event, body):
+
+@shared_task
+def process_webhook(event, body):
     appts_hooks = ['APPOINTMENT_CREATE', 'APPOINTMENT_MODIFY']
     patient_hooks = ['PATIENT_CREATE', 'PATIENT_MODIFY']
+    print(event)
     if event in appts_hooks:
         if event == appts_hooks[0]:
             try:
-                create_appointments_local([body], request.user)
-            except:
+                doctor = Doctor.objects.get(doctor_id=body['doctor'])
+                create_appointments_local([body], doctor.doctor_user)
+                print('appt added')
+                return True
+            except Exception as e:
+                print(e)
                 return False
     elif event in patient_hooks:
         if event == patient_hooks[0]:
             try:
                 create_patients_local([body])
-            except:
+                print('patient added')
+                return True
+            except Exception as e:
+                print(e)
                 return False
     return True
