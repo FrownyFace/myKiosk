@@ -137,6 +137,8 @@ class AppointmentManager(models.Manager):
                 'checked_in_time': checked_in_time,
                 'seen_at_time': seen_at_time,
                 'completed_at_time': completed_at_time,
+                'duration': appt.duration,
+                'sch_time_datetime': appt.scheduled_time,
             })
         return retAppts
 
@@ -162,6 +164,7 @@ class Appointment(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, editable=False, blank=True)
     scheduled_time = models.DateTimeField()
     scheduled_date = models.DateField()
+    duration = models.IntegerField(default=0)
     is_walk_in = models.BooleanField()
     reason = models.CharField(max_length=200, blank=True, null=True)
 
@@ -232,8 +235,9 @@ class Appointment(models.Model):
                 count += 1
         total_waiting_time = total_waiting_time.microseconds + \
                  1000000 * (total_waiting_time.seconds + 86400 * total_waiting_time.days)
-
-        return total_waiting_time // (count*1000)
+        if count > 0:
+            return total_waiting_time // (count*1000)
+        return 0
 
     def __str__(self):
         return '{}, {}, {}'.format(self.doctor, self.patient, self.scheduled_time)

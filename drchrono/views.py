@@ -6,6 +6,7 @@ import hashlib
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import components
+from schedule.models import Calendar
 
 from utils import *
 from forms import *
@@ -24,6 +25,8 @@ def home(request):
         return redirect(reverse('doctor'))
     #appointments = get_all_daily_appointments(request)
     update_local(request)
+    create_calendar()
+    update_calendar()
     appts = Appointment.objects.get_appointments()
     avg_waiting_time = Appointment.avg_waiting_time()
     return render(request, 'home.html', {'appointments': appts,
@@ -180,10 +183,17 @@ def complete(request, appt_id):
             messages.error(request, "Complete Failed", extra_tags="warning")
     return redirect(reverse('home'))
 
+
 @login_required
 def schedule(request):
+    avg_waiting_time = Appointment.avg_waiting_time()
+    try:
+        cal = Calendar.objects.get(name='Main Calendar')
+    except Calendar.DoesNotExist:
+        cal = create_calendar()
 
-    return render(request, 'schedule.html')
+    return render(request, 'schedule.html', {"avg_waiting_time": avg_waiting_time,
+                                             "slug": cal})
 
 @login_required
 def analysis(request):

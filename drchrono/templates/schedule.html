@@ -2,7 +2,9 @@
 {% block head_title %}Schedule{{ block.super }}{% endblock %}
 
 {% block content %}
+{% include 'nav.html' %}
 
-schedule
+<div id="calendar"></div>
 
+{% include 'footer.html' with avg_waiting_time=avg_waiting_time%}
 {% endblock %}

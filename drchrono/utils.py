@@ -4,7 +4,11 @@ from django.shortcuts import redirect
 import hashlib
 import pytz
 from dateutil import parser
+from datetime import timedelta
 
+from schedule.models import Calendar
+from schedule.models import Event
+from schedule.models import Rule
 
 from api import Endpoint, URL_ROOT
 from models import *
@@ -61,19 +65,26 @@ def create_appointments_local(appointments, doctor):
             checked_in = False
             seen = False
             completed = False
+            checked_in_time = None
+            seen_at_time = None
+            completed_at_time = None
             status = 'Not yet arrived'
+            print(appt['status'])
             if appt['status'] == 'Arrived':
                 checked_in = True
                 status = 'Checked in'
+                checked_in_time = dt
             elif appt['status'] == 'In Session':
                 checked_in = True
                 seen = True
                 status = 'Currently in session'
+                seen_at_time = dt
             elif appt['status'] == 'Complete':
                 checked_in = True
                 seen = True
                 completed = True
                 status = 'Completed appointment'
+                completed_at_time = dt + timedelta(minutes=int(appt['duration']))
             a = {
                 'appointment_id': int(appt['id']),
                 'doctor': Doctor.objects.get(doctor_user=doctor),
@@ -86,6 +97,10 @@ def create_appointments_local(appointments, doctor):
                 'checked_in': checked_in,
                 'seen': seen,
                 'completed': completed,
+                'checked_in_time': checked_in_time,
+                'seen_at_time': seen_at_time,
+                'completed_at_time': completed_at_time,
+                'duration': appt['duration'],
                 }
             Appointment.objects.create(**a)
 
@@ -173,6 +188,44 @@ def find_appts_by_patient_local(patient):
             'reason': appt.reason,
         })
     return contextAppts
+
+def create_calendar():
+    try:
+        Calendar.objects.get(name='Main Calendar')
+        return False
+    except Calendar.DoesNotExist:
+        print('calendar not found')
+    print('creating calendar')
+    cal = Calendar(name="Main Calendar", slug="main")
+    cal.save()
+    try:
+        rule = Rule.objects.get(name="Daily")
+    except Rule.DoesNotExist:
+        rule = Rule(frequency="YEARLY", name="Yearly", description="will recur once every Year")
+        rule.save()
+        rule = Rule(frequency="MONTHLY", name="Monthly", description="will recur once every Month")
+        rule.save()
+        rule = Rule(frequency="WEEKLY", name="Weekly", description="will recur once every Week")
+        rule.save()
+        rule = Rule(frequency="DAILY", name="Daily", description="will recur once every Day")
+        rule.save()
+    appts = Appointment.objects.get_appointments()
+    rule = Rule.objects.get(frequency='YEARLY')
+    for appt in appts:
+        data = {
+            'title': appt['first_name'] + ' ' + appt['last_name'],
+            'start': appt['sch_time_datetime'],
+            'end': appt['sch_time_datetime'] + timedelta(minutes=appt['duration']),
+            'calendar': cal
+        }
+        event = Event(**data)
+        event.save()
+
+    return cal
+
+def update_calendar():
+    return False
+
 
 
 ### Helpers

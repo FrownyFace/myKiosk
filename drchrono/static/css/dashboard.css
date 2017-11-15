@@ -2,9 +2,15 @@ html{
     font-family: 'Roboto', sans-serif;
 }
 
-body{
-    padding: 10px;
-}
+ body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1 0 auto;
+  }
 
 .messages_cont {
     position: absolute;
@@ -69,12 +75,3 @@ a {
     background-color: transparent;
 }
 
- body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-  }
-
-  main {
-    flex: 1 0 auto;
-  }
