@@ -80,6 +80,12 @@ $(document).ready(function() {
         events: '/schedule/api/occurrences?calendar_slug=main',
     })
     $('#calendar').fullCalendar('changeView', 'agendaWeek')
+
+
+    var userList = new List('apptslist', {
+      valueNames: [ 'name', 'scheduled_time' ]
+    });
+
     displayTime();
     update_waiting_time('checked_in');
     update_waiting_time('seen_at');
