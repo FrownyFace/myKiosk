@@ -3,8 +3,18 @@
 
 {% block content %}
 
-  <a class="btn-floating waves-effect waves-light
+
+
+    {% if doctor_secure %}
+    <a class="btn waves-effect waves-light back_btn" href="{% url 'home' %}" name="action">Dashboard
+        <i class="material-icons left">arrow_back</i>
+        <a class="btn-floating waves-effect waves-light
+  pink lighten-4 disable_btn modal-trigger" data-target="modal1"><i class="material-icons">add</i></a>
+    </a>
+    {% else %}
+        <a class="btn-floating waves-effect waves-light
   pink lighten-4 disable_btn modal-trigger" data-target="modal2"><i class="material-icons">add</i></a>
+    {% endif %}
 
 <div class="container" >
     <h1>Check-in to your appointment</h1>

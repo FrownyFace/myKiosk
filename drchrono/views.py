@@ -53,14 +53,9 @@ def disable_kiosk(request):
 @doctor_required
 @login_required
 def home(request):
-    doc = Doctor.objects.filter(doctor_user=request.user)
-    if not doc:
-        messages.warning(request, "Please Verify New Doctor", extra_tags="info")
-        return redirect(reverse('doctor'))
-
-    update_local(request)
     create_calendar()
-    update_calendar()
+    update_local(request)
+    #update_calendar(re)
     appts = Appointment.objects.get_appointments()
     avg_waiting_time = Appointment.avg_waiting_time()
     return render(request, 'home.html', {'appointments': appts,
@@ -122,8 +117,10 @@ def checkin(request):
     if request.method == 'GET':
         form = CheckInForm()
         avg_waiting_time = Appointment.avg_waiting_time()
+        doctor_secure = True if 'doctor_secure' in request.session else False
         return render(request, 'checkin.html', {'checkinForm': form,
-                                                'avg_waiting_time': avg_waiting_time})
+                                                'avg_waiting_time': avg_waiting_time,
+                                                'doctor_secure': doctor_secure})
     elif request.method == 'POST':
         form = CheckInForm(request.POST)
         if form.is_valid():
@@ -134,13 +131,6 @@ def checkin(request):
             if not patient:
                 messages.error(request, "Patient Not Found", extra_tags="danger")
                 return redirect(reverse('checkin'))
-            #request.session['patient'] = patient.id
-            #appts = find_appts_by_patient_local(patient)
-            #print(appts)
-            #if not appts:
-            #    messages.error(request, "No Appointments Found", extra_tags="danger")
-            #    return redirect(reverse('checkin'))
-            #return render(request, 'verify.html', {'appts_list': appts})
             return redirect('/verify/{}/'.format(patient.id))
         else:
             messages.error(request, "Form is not valid", extra_tags="danger")

@@ -85,7 +85,7 @@ def create_appointments_local(appointments, doctor):
                 completed = True
                 status = 'Completed appointment'
                 completed_at_time = dt + timedelta(minutes=int(appt['duration']))
-            a = {
+            appt = {
                 'appointment_id': int(appt['id']),
                 'doctor': Doctor.objects.get(doctor_user=doctor),
                 'patient': Patient.objects.get(patient_id=int(appt['patient'])),
@@ -102,7 +102,8 @@ def create_appointments_local(appointments, doctor):
                 'completed_at_time': completed_at_time,
                 'duration': appt['duration'],
                 }
-            Appointment.objects.create(**a)
+            Appointment.objects.create(**appt)
+            update_calendar(appt)
 
 
 def find_doctor(request):
@@ -209,22 +210,20 @@ def create_calendar():
         rule.save()
         rule = Rule(frequency="DAILY", name="Daily", description="will recur once every Day")
         rule.save()
-    appts = Appointment.objects.get_appointments()
-    rule = Rule.objects.get(frequency='YEARLY')
-    for appt in appts:
-        data = {
-            'title': appt['first_name'] + ' ' + appt['last_name'],
-            'start': appt['sch_time_datetime'],
-            'end': appt['sch_time_datetime'] + timedelta(minutes=appt['duration']),
-            'calendar': cal
-        }
-        event = Event(**data)
-        event.save()
 
     return cal
 
-def update_calendar():
-    return False
+def update_calendar(appt):
+    print('updating calendar')
+    cal = Calendar.objects.get(name='Main Calendar')
+    data = {
+            'title': appt['patient'].first_name + ' ' + appt['patient'].last_name,
+            'start': appt['scheduled_time'],
+            'end': appt['scheduled_time'] + timedelta(minutes=appt['duration']),
+            'calendar': cal
+    }
+    Event.objects.create(**data)
+    return True
 
 
 
@@ -239,6 +238,9 @@ def timeformater(dt):
 ### Decorators
 def doctor_required(func):
     def wrapper(request, *args, **kwargs):
+        if not Doctor.objects.all().exists():
+            #messages.warning(request, "Please Verify New Doctor", extra_tags="info")
+            return redirect(reverse('doctor'))
         if 'doctor_secure' not in request.session.keys():
             return redirect(reverse('checkin'))
         return func(request, *args, **kwargs)

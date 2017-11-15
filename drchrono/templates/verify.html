@@ -3,6 +3,8 @@
 
 {% block content %}
 
+<a class="btn-floating waves-effect waves-light back_btn" href="{% url 'checkin' %}">
+        <i class="material-icons left">arrow_back</i></a>
 
 <ul class="collection">
 {% for appt in appts_list %}
