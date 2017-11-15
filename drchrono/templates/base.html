@@ -27,6 +27,35 @@
     </div>
     </main>
 
+    <div id="modal1" class="modal bottom-sheet">
+    <div class="modal-content">
+        <div class="container">
+          <h4>Enter Kiosk Key to Enable</h4>
+            <form action="/enable_kiosk/" method="POST">{% csrf_token %}
+                <div class="input-field col s6">
+                    <input id="enable_key" type="text" class="validate" name="key">
+                    <label for="enable_key" data-error="wrong">Key</label>
+                </div>
+                <button type="submit" class="waves-effect waves-green btn">Submit</button>
+            </form>
+        </div>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal bottom-sheet">
+    <div class="modal-content">
+        <div class="container">
+          <h4>Enter Kiosk Key to Disable</h4>
+            <form action="/disable_kiosk/" method="POST">{% csrf_token %}
+                <div class="input-field col s6">
+                    <input id="disable_key" type="text" class="validate" name="key">
+                    <label for="disable_key" data-error="wrong">Key</label>
+                </div>
+                <button type="submit" class="waves-effect waves-green btn">Submit</button>
+            </form>
+          </div>
+        </div>
+    </div>
 
   {% block footer %}{% endblock %}
 

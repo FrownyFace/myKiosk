@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.http import Http404
 import hashlib
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -17,12 +18,37 @@ def logout(request):
     return redirect(reverse('login'))
 
 @login_required
+def enable_kiosk(request):
+    if request.method == 'GET':
+        raise Http404("Wrong Method")
+    elif request.method == 'POST':
+        key = request.POST.get("key", "")
+        if key == Doctor.objects.get(doctor_user=request.user).kiosk_key:
+            del request.session['doctor_secure']
+        else:
+            messages.error(request, "Wrong key", extra_tags="danger")
+    return redirect(reverse('home'))
+
+@login_required
+def disable_kiosk(request):
+    if request.method == 'GET':
+        raise Http404("Wrong Method")
+    elif request.method == 'POST':
+        key = request.POST.get("key", "")
+        if key == Doctor.objects.get(doctor_user=request.user).kiosk_key:
+            request.session['doctor_secure'] = True
+        else:
+            messages.error(request, "Wrong key", extra_tags="danger")
+    return redirect(reverse('home'))
+
+@doctor_required
+@login_required
 def home(request):
     doc = Doctor.objects.filter(doctor_user=request.user)
     if not doc:
-        messages.warning(request, "Please Verify New Doctor", extra_tags="warning")
+        messages.warning(request, "Please Verify New Doctor", extra_tags="info")
         return redirect(reverse('doctor'))
-    #appointments = get_all_daily_appointments(request)
+
     update_local(request)
     create_calendar()
     update_calendar()
@@ -36,14 +62,18 @@ def doctor(request):
     doc = Doctor.objects.filter(doctor_user=request.user)
     if request.method == 'GET':
         if len(doc) != 0:
-            doc_info = doc[0]
-            doc_form = NewDoctorForm({'first_name': doc_info.first_name,
-                                      'last_name': doc_info.last_name,
-                                      'office_phone': doc_info.office_phone,
-                                      'doctor_id': doc_info.id,
-                                      'office_name': doc_info.office_name,
-                                      'kiosk_key': doc_info.kiosk_key,
-                                      })
+            if 'doctor_secure' in request.session.keys():
+                doc_info = doc[0]
+                doc_form = NewDoctorForm({'first_name': doc_info.first_name,
+                                          'last_name': doc_info.last_name,
+                                          'office_phone': doc_info.office_phone,
+                                          'doctor_id': doc_info.id,
+                                          'office_name': doc_info.office_name,
+                                          'kiosk_key': doc_info.kiosk_key,
+                                          })
+            else:
+                messages.error(request, "Woah not secure - redirecting", extra_tags="danger")
+                return redirect(reverse('home'))
         else:
             doc_info = find_doctor(request)
             doc_form = NewDoctorForm({'first_name': doc_info['first_name'],
@@ -58,12 +88,17 @@ def doctor(request):
         form = NewDoctorForm(request.POST)
         if form.is_valid():
             if len(doc) != 0:
-                if update_doctor(request, doc[0], form.cleaned_data):
-                    messages.success(request, "Doctor Updated", extra_tags="success")
+                if 'doctor_secure' in request.session.keys():
+                    if update_doctor(request, doc[0], form.cleaned_data):
+                        messages.success(request, "Doctor Updated", extra_tags="success")
+                    else:
+                        messages.error(request, "Doctor could not be updated", extra_tags="danger")
                 else:
-                    messages.error(request, "Doctor could not be updated", extra_tags="danger")
+                    messages.error(request, "Woah not secure - redirecting", extra_tags="danger")
+                    return redirect(reverse('home'))
             else:
                 if add_doctor(request, form.cleaned_data):
+                    request.session['doctor_secure'] = True
                     messages.success(request, "Doctor Added", extra_tags="success")
                 else:
                     messages.error(request, "Doctor could not be created", extra_tags="danger")
@@ -153,7 +188,7 @@ def info(request, appt_id):
                     infoForm.save(commit=True)
                     messages.success(request, "Patient and Appointment saved", extra_tags="success")
                 else:
-                    messages.error(request, "AHHHH SOMETHING IS WRONG", extra_tags="warning")
+                    messages.error(request, "AHHHH SOMETHING IS WRONG", extra_tags="danger")
             return redirect(reverse('home'))
 
         del request.session['one_time_secure']
@@ -161,6 +196,7 @@ def info(request, appt_id):
         messages.error(request, "Woah not secure - redirecting", extra_tags="danger")
     return redirect(reverse('home'))
 
+@doctor_required
 @login_required
 def see(request, appt_id):
     if request.method == 'GET':
@@ -169,9 +205,10 @@ def see(request, appt_id):
             appt.seen_func(request)
             messages.success(request, "Seen", extra_tags="success")
         except:
-            messages.error(request, "Seen Failed", extra_tags="warning")
+            messages.error(request, "Seen Failed", extra_tags="danger")
     return redirect(reverse('home'))
 
+@doctor_required
 @login_required
 def complete(request, appt_id):
     if request.method == 'GET':
@@ -180,15 +217,16 @@ def complete(request, appt_id):
             appt.completed_func(request)
             messages.success(request, "Complete", extra_tags="success")
         except:
-            messages.error(request, "Complete Failed", extra_tags="warning")
+            messages.error(request, "Complete Failed", extra_tags="danger")
     return redirect(reverse('home'))
 
-
+@doctor_required
 @login_required
 def schedule(request):
     avg_waiting_time = Appointment.avg_waiting_time()
     return render(request, 'schedule.html', {"avg_waiting_time": avg_waiting_time})
 
+@doctor_required
 @login_required
 def analysis(request):
     p1 = figure(plot_width=475, plot_height=355)
