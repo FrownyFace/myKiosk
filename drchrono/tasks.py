@@ -27,32 +27,3 @@ def process_webhook(request, event, body):
             except:
                 return False
     return True
-
-'''
-class ProcessMessages(PeriodicTask):
-    run_every = crontab()  # this will run once a minute
-    def run(self, **kwargs):
-        print('test celery')
-        return 'hi mom'
-
-    def get_transactions_to_process(self):
-        return WebhookTransaction.objects.filter(
-            event_name__in=self.event_names,
-            status=WebhookTransaction.UNPROCESSED
-        )
-    def process_trans(self, trans):
-        a = {}
-        return Patient.create(**a)
-
-unprocessed_trans = self.get_transactions_to_process()
-
-        for trans in unprocessed_trans:
-            try:
-                self.process_trans(trans)
-                trans.status = WebhookTransaction.PROCESSED
-                trans.save()
-
-            except Exception:
-                trans.status = WebhookTransaction.ERROR
-                trans.save()
-                '''
