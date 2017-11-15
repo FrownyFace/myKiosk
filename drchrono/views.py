@@ -2,11 +2,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponse
 import hashlib
+import json, copy
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import components
+from django.views.decorators.csrf import csrf_exempt
+
+from tasks import process_webhook
 
 from utils import *
 from forms import *
@@ -249,3 +253,16 @@ def analysis(request):
     return render(request, 'analysis.html',
                   {"the_script": script, "the_div": div,
                   "avg_waiting_time": avg_waiting_time})
+
+@csrf_exempt
+def webhook(request):
+    if request.method == 'GET':
+        return HttpResponse(json.dumps({'secret_token':'haha'}), content_type="application/json", status=200, )
+    if request.method == 'POST':
+        event = request.META['HTTP_X_DRCHRONO_EVENT']
+        body = request.body['object']
+        process_webhook(request, event, body)
+
+        return HttpResponse(status=200)
+    return HttpResponse(json.dumps({'secret_token': 'haha'}), content_type="application/json", status=200, )
+

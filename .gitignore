@@ -49,5 +49,7 @@ Temporary Items
 migrations
 drchrono_virtualenv
 *.sqlite3
+*.db
 *.pyc
+*.rdb
 

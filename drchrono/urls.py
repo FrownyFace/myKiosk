@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^complete/(\d+)/$', views.complete, name='complete'),
 
     url(r'^oauth/', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^webhook/$', views.webhook, name='webhook'),
     url(r'^admin/', admin.site.urls),
 ]

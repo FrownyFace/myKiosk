@@ -112,6 +112,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
+# Celery?
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'US/Pacific'
+CELERY_BEAT_SCHEDULE = {}
+
+
 SOCIAL_AUTH_DRCHRONO_KEY = 'tXZf6Cf6CsXIg6HWPpza2niHrz385l5gdAQvU5tK'
 SOCIAL_AUTH_DRCHRONO_SECRET = '9nZnKI5x5fsSWfZa6e64vClsBNamV2iaJ7Ay7CPRHbvuDRrNno1tSVVsBFcGe95JTZ81C4bwWVXI23278sTwXutPheA2LUdcpWoO9aE3lySX0P3BZ1c7nmlgnT8j7DGg'
 LOGIN_URL = 'login'
