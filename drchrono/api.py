@@ -36,3 +36,10 @@ def patch_appointment(request, appointment_id, payload):
     response = e.patch(url, payload=payload)
     print(response)
     return response
+
+
+def patch_patient(request, patient_id, payload):
+    e = Endpoint(request)
+    url = "{}/patients/{}".format(URL_ROOT, patient_id)
+    response = e.patch(url, payload)
+    return response

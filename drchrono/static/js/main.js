@@ -69,9 +69,9 @@ $(document).ready(function() {
 
     $('#calendar').fullCalendar({
         header: {
-				left: 'prev,next today',
+				left: '',
 				center: 'title',
-				right: 'month,agendaWeek,agendaDay,listWeek'
+				right: ''
 				},
 		navLinks: true, // can click day/week names to navigate views
 		editable: false,

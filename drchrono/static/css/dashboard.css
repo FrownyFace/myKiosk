@@ -18,6 +18,7 @@ html{
     right: 0;
     margin-top: 65px;
     list-style: none;
+    z-index: 101;
 }
 
 .fade.in {

@@ -6,7 +6,6 @@ import hashlib
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import components
-from schedule.models import Calendar
 
 from utils import *
 from forms import *
@@ -120,8 +119,8 @@ def verify(request, patient_id):
         form = VerifyForm(request.POST)
         if form.is_valid():
             try:
-                print(hashlib.sha256(form.cleaned_data['ssn']).hexdigest())
-                print(Patient.objects.get(id=patient_id).ssn)
+                #print(hashlib.sha256(form.cleaned_data['ssn']).hexdigest())
+                #print(Patient.objects.get(id=patient_id).ssn)
                 if hashlib.sha256(form.cleaned_data['ssn']).hexdigest() == Patient.objects.get(id=patient_id).ssn:
                     request.session['one_time_secure'] = True
                     return redirect('/info/{}/'.format(form.cleaned_data['appt_id']))
@@ -146,14 +145,15 @@ def info(request, appt_id):
             appt = Appointment.objects.get(id=appt_id)
             patient = Patient.objects.get(id=appt.patient.id)
 
-            infoForm = InfoForm(request.POST)
+            infoForm = InfoForm(instance=patient, data=request.POST)
             infoForm.id = patient.id
             infoForm.patient_id = patient.patient_id
             if infoForm.is_valid():
-                infoForm.save()
-
-            appt.checked_in_func(request)
-            messages.success(request, "WEEEEEEEE", extra_tags="success")
+                if infoForm.patch_and_save(request) and appt.checked_in_func(request):
+                    infoForm.save(commit=True)
+                    messages.success(request, "Patient and Appointment saved", extra_tags="success")
+                else:
+                    messages.error(request, "AHHHH SOMETHING IS WRONG", extra_tags="warning")
             return redirect(reverse('home'))
 
         del request.session['one_time_secure']
@@ -187,13 +187,7 @@ def complete(request, appt_id):
 @login_required
 def schedule(request):
     avg_waiting_time = Appointment.avg_waiting_time()
-    try:
-        cal = Calendar.objects.get(name='Main Calendar')
-    except Calendar.DoesNotExist:
-        cal = create_calendar()
-
-    return render(request, 'schedule.html', {"avg_waiting_time": avg_waiting_time,
-                                             "slug": cal})
+    return render(request, 'schedule.html', {"avg_waiting_time": avg_waiting_time})
 
 @login_required
 def analysis(request):
